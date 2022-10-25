@@ -19,6 +19,9 @@ target/
 .settings
 .springBeans
 
+### mac ###
+.DS_Store
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
