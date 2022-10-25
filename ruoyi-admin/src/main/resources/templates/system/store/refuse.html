@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('备注')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-user-resetPwd">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">备注：</label>
+                <div class="col-sm-8">
+                    <input id="reason" class="form-control" type="text" name="reason" />
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+
+    <script>
+        var storeId = [[${storeInfo.id}]]
+        function submitHandler() {
+
+            var reason = $("#reason").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "system/store/audit",
+                data : {
+                    "id": storeId,
+                    "reason": reason,
+                    "status": 3
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

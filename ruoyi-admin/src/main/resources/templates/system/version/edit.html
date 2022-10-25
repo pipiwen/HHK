@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('版本编辑')" />
+	<th:block th:include="include :: ztree-css" />
+	<th:block th:include="include :: datetimepicker-css" />
+	<th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		<form class="form-horizontal m" id="form-role-edit" th:object="${version}">
+			<input id="id" name="id" type="hidden" th:field="*{id}"/>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">版本号：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="versionCode" id="versionCode" th:field="*{versionCode}" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">版本名称：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="versionName" id="versionName" th:field="*{versionName}" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">版本类型：</label>
+				<div class="col-sm-8">
+					<select id="versionType" class='form-control' name="versionType" style="width: 100%">
+						<option value="2">销售端</option>
+						<option value="3">客户端</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">描述：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="description" id="description" th:field="*{description}" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">文件上传</label>
+				<div class="file-loading">
+					<input id="apkFile" name="file" type="file">
+				</div>
+			</div>
+		</form>
+	</div>
+	<th:block th:include="include :: footer" />
+	<th:block th:include="include :: ztree-js" />
+	<th:block th:include="include :: datetimepicker-js" />
+	<th:block th:include="include :: bootstrap-fileinput-js" />
+	<script type="text/javascript">
+
+		var fileName = '';
+		// 单图上传
+		$("#apkFile").fileinput({
+			uploadUrl: ctx + 'common/upload',
+			maxFileCount: 1,
+			autoReplace: true
+		}).on('fileuploaded', function (event, data, previewId, index) {
+			var rsp = data.response;
+			fileName = rsp.fileName;
+			log.info("return url：" + rsp.url)
+			log.info("reutrn fileName：" + rsp.fileName)
+		}).on('fileremoved', function (event, id, index) {
+			$("input[name='" + event.currentTarget.id + "']").val('')
+		})
+
+		function edit() {
+			var id = $("input[name='id']").val();
+			var versionType = $("#versionType option:selected").val();
+			var versionCode = $("input[name='versionCode']").val();
+			var versionName = $("input[name='versionName']").val();
+			var description = $("input[name='description']").val();
+			var downloadUrl = fileName;
+			$.ajax({
+				cache : true,
+				type : "POST",
+				url : ctx + "system/version/edit",
+				data : {
+					"id": id,
+					"versionType": versionType,
+					"versionCode": versionCode,
+					"versionName": versionName,
+					"description": description,
+					"downloadUrl": downloadUrl
+				},
+				async : false,
+				error : function(request) {
+					$.modal.alertError("系统错误");
+				},
+				success : function(data) {
+					$.operate.successCallback(data);
+				}
+			});
+		}
+		
+		function submitHandler() {
+			edit();
+	    }
+	</script>
+</body>
+</html>

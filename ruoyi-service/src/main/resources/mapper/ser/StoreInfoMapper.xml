@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.ser.mapper.StoreInfoMapper">
+
+
+    <select id="listByCondition" resultType="com.ruoyi.ser.domain.StoreInfo">
+        select sir.*, su.phonenumber from store_info_record sir
+            left join sys_user su
+            on sir.user_id = su.user_id
+        <where>
+            <if test="storeName != null and storeName != ''">
+                and store_name like concat('%', #{storeName}, '%')
+            </if>
+            <if test="phonenumber != null and phonenumber != ''">
+                and su.phonenumber = #{phonenumber}
+            </if>
+            <if test="status != null and status != ''">
+                and sir.status = #{status}
+            </if>
+            <if test="startTime != null">
+                <![CDATA[and sir.create_time >= #{startTime} ]]>
+            </if>
+            <if test="endTime != null">
+                <![CDATA[and sir.create_time >= #{endTime} ]]>
+            </if>
+        </where>
+    </select>
+</mapper>

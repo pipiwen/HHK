@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.ser.mapper.CustomerAttentionMapper">
+
+
+    <select id="listAttention" resultType="com.ruoyi.ser.domain.UserDetail">
+        select csa.*, ud.*, su.phonenumber from cust_sale_attention csa
+        left join user_detail ud on csa.sale_id = ud.user_id
+        left join sys_user su on csa.sale_id = su.user_id
+        <where>
+            csa.cust_id = #{userId}
+        </where>
+    </select>
+</mapper>

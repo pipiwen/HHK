@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.ser.mapper.CustomerBlacklistMapper">
+
+
+    <select id="listBlacklist" resultType="com.ruoyi.ser.domain.UserDetail">
+        select csb.*, ud.*, su.phonenumber from cust_sale_blacklist csb
+        left join user_detail ud on csb.sale_id = ud.user_id
+        left join sys_user su on csb.sale_id = su.user_id
+        <where>
+            csb.cust_id = #{userId}
+        </where>
+
+    </select>
+</mapper>

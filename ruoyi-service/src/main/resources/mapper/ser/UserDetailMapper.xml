@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.ser.mapper.UserDetailMapper">
+
+
+    <select id="listByCondition" resultType="com.ruoyi.ser.domain.UserDetail">
+        SELECT a.* from (
+            SELECT ud.*,su.login_name userName, su.phonenumber,
+                   ROUND(
+            6378.138 * 2 * ASIN(
+            SQRT(
+            POW(
+            SIN(
+            (
+            #{lat} * PI() / 180 - lat * PI() / 180
+            ) / 2
+            ),
+            2
+            ) + COS(#{lat} * PI() / 180) * COS(lat * PI() / 180) * POW(
+            SIN(
+            (
+            #{lon} * PI() / 180 - lon * PI() / 180
+            ) / 2
+            ),
+            2
+            )
+            )
+            )
+            ) AS distance FROM user_detail ud
+            left join sys_user su on ud.user_id = su.user_id
+        ) a
+            <where>
+                (
+                1 = 1
+
+                <if test="sex != null and sex != '' or sex == 0">
+                    AND a.sex = #{sex}
+                </if>
+                <if test="industryType != null and industryType != ''">
+                    AND find_in_set(#{industryType}, a.industry_type)
+                </if>
+                <if test="tagList != null and tagList != ''">
+                    AND
+                    <foreach collection="tagList" item="item" open="(" separator="or" close=")">find_in_set(#{item}, a.tag)
+                    </foreach>
+                </if>
+                <if test="nickName != null and nickName != ''">
+                    AND a.nick_name like concat('%', #{nickName}, '%')
+                </if>
+                <if test="userType != null and userType != ''">
+                    AND a.user_type = #{userType}
+                </if>
+                and a.is_import != 1
+                <![CDATA[and a.distance <= 50000 ]]>
+                )
+                <if test="attribution != null and attribution != ''">
+                    or a.attribution = #{attribution}
+                </if>
+        ORDER BY -a.distance DESC
+        </where>
+    </select>
+    <select id="getCustomerDetail" resultType="com.ruoyi.ser.domain.UserDetail">
+        select ud.*, su.login_name userName, su.phonenumber from user_detail ud
+             left join sys_user su on ud.user_id = su.user_id
+        <where>
+            su.login_name = #{userName}
+        </where>
+    </select>
+
+    <select id="getUserDetail" resultType="com.ruoyi.ser.domain.UserDetail">
+        select ud.*, su.login_name userName, su.phonenumber from user_detail ud
+        left join sys_user su on ud.user_id = su.user_id
+        <where>
+            su.user_id = #{userId}
+        </where>
+    </select>
+
+    <update id="updateBalanceBatch" parameterType="java.util.List">
+        update user_detail
+        set account_balance =
+
+<!--        <foreach collection="list" item="item" index="index"-->
+<!--                 separator=" " open="case dept_id" close="end">-->
+<!--            when #{item.deptId} then #{item.ancestors}-->
+<!--        </foreach>-->
+
+        <if test="accountBalance != null and accountBalance != ''">
+            account_balance = account_balance + #{accountBalance},
+        </if>
+            update_time = sysdate()
+
+
+        where user_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item.userId}
+        </foreach>
+    </update>
+    <update id="updateAccountBalance">
+        update user_detail
+        <set>
+            account_balance = account_balance + #{accountBalance},
+            update_time = sysdate()
+        </set>
+        <where>
+            user_id = #{userId}
+        </where>
+    </update>
+</mapper>

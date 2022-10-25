@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('活动角色')" />
+	<th:block th:include="include :: ztree-css" />
+	<th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		<form class="form-horizontal m" id="form-role-edit" th:object="${award}">
+			<input id="id" name="id" type="hidden" th:field="*{id}"/>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">奖励名称：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="awardName" id="awardName" th:field="*{awardName}" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">奖励总额：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="awardTotal" id="awardTotal" th:field="*{awardTotal}" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">红包个数：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="awardNum" id="awardNum" th:field="*{awardNum}" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">最小红包：</label>
+				<div class="col-sm-3">
+					<input class="form-control" type="text" name="awardMin" id="awardMin" th:field="*{awardMin}" required>
+				</div>
+			</div>
+			<div class="form-group">
+
+				<label class="col-sm-3 control-label is-required">最大红包：</label>
+				<div class="col-sm-3">
+					<input class="form-control" type="text" name="awardMax" id="awardMax" th:field="*{awardMax}" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">开始时间：</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="awardStartTime" th:field="*{awardStartTime}" name="awardStartTime"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label is-required">结束时间：</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control"  id="awardEndTime" th:field="*{awardEndTime}" name="awardEndTime"/>
+				</div>
+			</div>
+		</form>
+	</div>
+	<th:block th:include="include :: footer" />
+	<th:block th:include="include :: ztree-js" />
+	<th:block th:include="include :: datetimepicker-js" />
+	<script type="text/javascript">
+
+		function edit() {
+			var id = $("input[name='id']").val();
+			var awardName = $("input[name='awardName']").val();
+			var awardTotal = $("input[name='awardTotal']").val();
+			var awardNum = $("input[name='awardNum']").val();
+			var awardMin = $("input[name='awardMin']").val();
+			var awardMax = $("input[name='awardMax']").val();
+			var awardStartTime = $("input[name='awardStartTime']").val();
+			var awardEndTime = $("input[name='awardEndTime']").val();
+			$.ajax({
+				cache : true,
+				type : "POST",
+				url : ctx + "system/award/edit",
+				data : {
+					"id": id,
+					"awardName": awardName,
+					"awardTotal": awardTotal,
+					"awardNum": awardNum,
+					"awardMin": awardMin,
+					"awardMax": awardMax,
+					"awardStartTime": awardStartTime,
+					"awardEndTime": awardEndTime
+				},
+				async : false,
+				error : function(request) {
+					$.modal.alertError("系统错误");
+				},
+				success : function(data) {
+					$.operate.successCallback(data);
+				}
+			});
+		}
+		
+		function submitHandler() {
+			edit();
+	    }
+	</script>
+</body>
+</html>

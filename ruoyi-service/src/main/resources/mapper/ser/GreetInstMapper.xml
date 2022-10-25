@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.ser.mapper.GreetInstMapper">
+
+    <select id="listByCondition1" resultType="com.ruoyi.ser.domain.UserDetail">
+    select ud.*,su.login_name userName, su.phonenumber, a.greet_status, a.greet_id
+           from (
+        select gi.id greet_id, gi.target_id user_id, gi.greet_status from greet_inst gi
+        where gi.launch_id = #{userId}
+        union
+        select gi.id greet_id, gi.launch_id user_id, gi.greet_status from greet_inst gi
+        where gi.target_id = #{userId}
+        ) a left join user_detail ud on a.user_id = ud.user_id
+        left join sys_user su on ud.user_id = su.user_id
+        <where>
+            <if test="greetStatus != null and greetStatus != ''">
+                AND a.greet_status = #{greetStatus}
+            </if>
+        </where>
+
+
+    </select>
+
+    <select id="listByCondition" resultType="com.ruoyi.ser.domain.UserDetail">
+        select ud.*,su.login_name userName, su.phonenumber, a.greet_status, a.greet_id, a.greet_type,
+               a.greet_time, a.pay_type
+        from (
+        select gi.id greet_id, gi.target_id user_id, gi.greet_status, gi.greet_type,
+        gi.greet_time, gi.pay_type from greet_inst gi
+        where gi.launch_id = #{userId} and gi.greet_type = #{greetType}
+        union
+        select gi.id greet_id, gi.launch_id user_id, gi.greet_status, gi.greet_type,
+        gi.greet_time, gi.pay_type from greet_inst gi
+        where gi.target_id = #{userId} and gi.greet_type != #{greetType}
+        ) a left join user_detail ud on a.user_id = ud.user_id
+        left join sys_user su on ud.user_id = su.user_id
+        <where>
+            <if test="greetStatus != 1">
+                a.greet_status != 1
+            </if>
+            <if test="greetStatus != null and greetStatus != ''">
+                AND a.greet_status = #{greetStatus}
+            </if>
+<!--            <if test="greetStatus == 1 ">-->
+<!--                or a.greet_status = 1-->
+<!--            </if>-->
+            <if test="userType != null and userType != ''">
+                AND a.greet_type = #{userType}
+            </if>
+
+        </where>
+        order by greet_status
+
+    </select>
+
+
+    <select id="saleInvitationList" resultType="com.ruoyi.ser.domain.UserDetail">
+        select ud.*,su.login_name userName, su.phonenumber, gi.greet_status, gi.id greet_id
+        from greet_inst gi
+                 left join user_detail ud on gi.target_id = ud.user_id
+                 left join sys_user su on ud.user_id = su.user_id
+        <where>
+            gi.greet_type = 1
+            and gi.launch_id = #{userId}
+            and gi.greetStatus = 2
+        </where>
+    </select>
+
+    <select id="customerInvitationList" resultType="com.ruoyi.ser.domain.UserDetail">
+        select ud.*,su.login_name userName, su.phonenumber, gi.greet_status, gi.id greet_id
+        from greet_inst gi
+        left join user_detail ud on gi.target_id = ud.user_id
+        left join sys_user su on ud.user_id = su.user_id
+        <where>
+            gi.greet_type = 2
+            and gi.launch_id = #{userId}
+            and (gi.greetStatus = 2 or gi.greetStatus = 6)
+        </where>
+    </select>
+
+
+</mapper>
